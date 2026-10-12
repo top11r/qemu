@@ -41,6 +41,7 @@ static EGLSurface surface;
 static EGLConfig config;
 static int win_w, win_h;
 static uint32_t current_pid;
+static unsigned long draw_count, stat_last_draws; static uint32_t stat_last_pid; /* MHI2_GL_STATS */
 static uint32_t primary_display_pid;
 static GLuint default_gmap[MAXOBJ];
 static GLuint *gmap = default_gmap;        /* guest object id -> real GL object */
@@ -612,6 +613,11 @@ static void serve(int cfd)
                      const char *dir=getenv("MHI2_GL_CLIENT_DIR");char path[4096];
                      snprintf(path,sizeof(path),"%s/mhi2-client-%u.ppm",dir&&*dir?dir:"/tmp",current_pid);
                      dump_frame(path);}
+                 if (getenv("MHI2_GL_STATS") && (current_pid != stat_last_pid || draw_count != stat_last_draws)) {
+                     fprintf(stderr, "glhost: stats pid=%u draws_since_swap=%lu frame=%lu\n", current_pid, draw_count, frames);
+                     stat_last_pid = current_pid; stat_last_draws = draw_count;
+                 }
+                 draw_count = 0;
                  eglSwapBuffers(display, surface);
                  if (frames < 3 || (frames % 120) == 0)
                      fprintf(stderr, "glhost: %lu frames swapped\n", frames + 1);
@@ -723,6 +729,7 @@ static void serve(int cfd)
         }
         case 31: case 32: case 129: {
             client_event(1);
+            draw_count++;
             GLuint menu_binding=menu_texture_begin_draw(op,p,len);
             unsigned mode=blend->program[blend->active_program];
             struct BlendState saved;

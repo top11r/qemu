@@ -1,6 +1,6 @@
 #include "bridge_transport.h"
 
-/* Surface size without GLBRIDGE_W/H; FPK1 builds use 1440x540. */
+/* Surface size without GLBRIDGE_W/H; FPK1 builds use 1440x540, Audi A4 MMI 1024x480. */
 #ifdef GLBRIDGE_TRACE
 /* Diagnostic build with -finstrument-functions: log the first calls of each
  * process as offsets from this anchor (map them with nm on the built .so). */
@@ -131,14 +131,14 @@ u32 eglQuerySurface(void *dpy, void *surf, i32 attr, i32 *value)
 {
     (void)dpy;(void)surf;
     const char *ws = getenv("GLBRIDGE_W"), *hs = getenv("GLBRIDGE_H");
-    i32 w = ws ? atoi(ws) : 800, h = hs ? atoi(hs) : 480;
+    i32 w = ws ? atoi(ws) : GLBRIDGE_DEFAULT_W, h = hs ? atoi(hs) : GLBRIDGE_DEFAULT_H;
     if ((u32)surf > 1) {
         struct NativeWindow *window = surf;
         w = window->buffers[0].width;
         h = window->buffers[0].height;
     }
-    if (w <= 0) w = 800;
-    if (h <= 0) h = 480;
+    if (w <= 0) w = GLBRIDGE_DEFAULT_W;
+    if (h <= 0) h = GLBRIDGE_DEFAULT_H;
     i32 v = 0;
     if (attr == 0x3057) v = w;        /* EGL_WIDTH */
     else if (attr == 0x3056) v = h;   /* EGL_HEIGHT */
