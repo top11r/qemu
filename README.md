@@ -467,6 +467,13 @@ images onto a real head unit.
   `MHI2_TOUCHPAD=0` disables its companion device.
 - **Navigation stalls on first start:** cold-start reliability remains open;
   deadline and delayed-launch experiments did not cure it and are excluded.
+- **Audi A4 goes black about 5 minutes into boot:** without a map database
+  navigation never initializes, the HMI startup watchdog fires ("Incomplete
+  HMI startup") and the Java HMI crashes. Stage a matching map package; see
+  [maps and Virtual Cockpit map](tools/mhi2/README.AUDI-A4.md#maps-and-virtual-cockpit-map).
+- **Audi A4 Virtual Cockpit says "Waiting for MOST video":** K3346 codes an
+  LVDS cockpit map, which the emulator cannot output. Launch with
+  `MHI2_NAV_MAP_TRANSMISSION=2` to use the firmware's MOST H.264 path instead.
 - **A session is already running:** close its viewer or stop its Terminal
   before starting another firmware profile.
 

@@ -77,6 +77,30 @@ accepts only 0..3; it does not prove Virtual Cockpit LVDS output.
 can name a local guest-command file appended to the diagnostic boot commands;
 neither option supplies a navigation startup fix.
 
+## Maps and Virtual Cockpit map
+
+The HMI waits for navigation during startup. Without a map database it never
+initializes, and the HMI watchdog resets the HMI about 300 s after its start.
+Extract the whole P470 package (Mib1 and Mib2; the Mib2 manifests reference
+Mib1/Eggnog and Mib2/Truffles) and stage it next to the build's disk:
+
+```sh
+python tools/mhi2/prepare_maps.py /path/to/extracted-P470 \
+  "$MHI2_REPRO/audi-a4-build/media/ui/emmc.raw" \
+  "$MHI2_REPRO/audi-a4-build/media/ui/emmc-maps.raw"
+rm "$MHI2_REPRO/audi-a4-build/media/ui/emmc-maps.navdb.qnx6"  # intermediate image
+```
+
+The launcher prefers `emmc-maps.raw` when its `.maps.json` exists; an explicit
+`MHI2_EMMC` still wins. Peak disk use is about three times the map size.
+
+K3346 codes the cockpit map as LVDS (adaptation byte 34 = 3). The emulator
+has no LVDS output, so the display manager's `createDisplay(4, lvds)` fails
+and the Virtual Cockpit panel waits. `MHI2_NAV_MAP_TRANSMISSION=2` selects the
+firmware's own MOST H.264 branch instead; the native navigation then renders
+the cockpit map and the panel decodes it. This changes the transport inside
+the emulator only; it does not reproduce the car's LVDS output.
+
 ## Map rendering experiment
 
 See [the shader experiment guide](experiments/audi-p470/README.md). This is an isolated, explicitly enabled

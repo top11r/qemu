@@ -113,9 +113,13 @@ def configure(name, media=None):
             if not (cache / 'manifest.json').is_file():
                 raise ValueError('Missing firmware shader cache: ' + str(cache))
             os.environ['MHI2_SHADER_CACHE'] = str(cache)
+        # Prefer a prepare_maps.py disk next to the base one; an explicit MHI2_EMMC still wins.
+        disk = directory / 'emmc.raw'
+        if (directory / 'emmc-maps.raw').is_file() and (directory / 'emmc-maps.maps.json').is_file():
+            disk = directory / 'emmc-maps.raw'
+        os.environ.setdefault('MHI2_EMMC', str(disk))
         os.environ.update(MHI2_DEBUG_NOR=str(directory / 'nor.bin'),
                           MHI2_IRAM=str(directory / 'iram.bin'),
-                          MHI2_EMMC=str(directory / 'emmc.raw'),
                           MHI2_MEDIA_ROOT=str(directory.parent))
     else:
         root = Path('/home/iscle/Downloads/mhi2-analysis/qemu')
