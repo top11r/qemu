@@ -125,7 +125,7 @@ Close the viewer to end the KSS link; press Ctrl-C to stop the emulator.
 SUMMARY
 # Multi-threaded TCG: with -icount shift=0 (round-robin vCPUs) procnto
 # randomly corrupts thread contexts and shuts down within minutes.
-exec"$here/venv/bin/python" @REPO@/tools/fpk1/run_stage1_console.py "$archive" \
+exec "$here/venv/bin/python" @REPO@/tools/fpk1/run_stage1_console.py "$archive" \
     --qemu "$here/qemu/qemu-system-arm" --tcg-thread multi --board-info \
     --emmc "$here/media/emmc.img" \
     --stage2-replace lib/libEGL.so="$here/bridge/libEGL.so" \

@@ -50,7 +50,8 @@ def inspect(path, data):
         row['existing_extractor'] = {'rejected':str(exc)}
     for match in re.finditer(rb'Tegra\0\0\0\0\0', data):
         vs, fs, count = struct.unpack_from('<III', data, match.start()-14)
-        assert count == 1
+        # count = platform variants; the generic Tegra pair comes first (AU491 adds a "Tegra - AU736_..." one).
+        assert count >= 1
         owners = [r for r in resources[1:] if r['kind']==1120 and
                   r['offset'] <= match.start() < r['offset']+r['size']+4]
         pos = match.end()
